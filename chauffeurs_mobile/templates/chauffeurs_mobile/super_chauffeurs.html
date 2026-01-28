@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Chauffeurs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+        }
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .chauffeur-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn-activer {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-desactiver {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-super {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .badge-actif {
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .badge-inactif {
+            background: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .badge-super {
+            background: #ff6b6b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>👥 Gestion des Chauffeurs</h1>
+                <p>Contrôle complet de tous les chauffeurs</p>
+            </div>
+            <div>
+                <a href="/mobile/super/" style="background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+                    ← Retour
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div id="statsBar" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <p style="text-align: center; color: #666;">Chargement des statistiques...</p>
+        </div>
+        
+        <div id="chauffeursList">
+            <p style="text-align: center; color: #666;">Chargement des chauffeurs...</p>
+        </div>
+    </div>
+
+    <script>
+    async function loadChauffeurs() {
+        try {
+            // Vérifier l'accès super
+            const checkResponse = await fetch('/mobile/api/super/check/');
+            const checkData = await checkResponse.json();
+            
+            if (!checkData.success || !checkData.is_super_chauffeur) {
+                window.location.href = '/mobile/super/';
+                return;
+            }
+            
+            // Charger la liste des chauffeurs
+            const response = await fetch('/mobile/api/super/chauffeurs/');
+            const data = await response.json();
+            
+            if (data.success) {
+                // Mettre à jour la barre de stats
+                document.getElementById('statsBar').innerHTML = `
+                    <div style="display: flex; justify-content: space-around; text-align: center;">
+                        <div>
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">${data.total}</div>
+                            <div style="color: #666;">Total</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; font-weight: bold; color: #28a745;">${data.actifs}</div>
+                            <div style="color: #666;">Actifs</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; font-weight: bold; color: #ff6b6b;">${data.super_chauffeurs}</div>
+                            <div style="color: #666;">Super</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Afficher la liste des chauffeurs
+                const container = document.getElementById('chauffeursList');
+                if (data.chauffeurs.length > 0) {
+                    let html = '';
+                    data.chauffeurs.forEach(chauffeur => {
+                        html += `
+                            <div class="chauffeur-card">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                            <strong style="font-size: 18px;">${chauffeur.nom}</strong>
+                                            <span class="${chauffeur.actif ? 'badge-actif' : 'badge-inactif'}">
+                                                ${chauffeur.actif ? 'ACTIF' : 'INACTIF'}
+                                            </span>
+                                            ${chauffeur.est_super ? '<span class="badge-super">SUPER</span>' : ''}
+                                        </div>
+                                        <div style="color: #666; margin-bottom: 8px;">
+                                            📞 ${chauffeur.telephone} | 🚗 ${chauffeur.vehicule}
+                                        </div>
+                                        <div style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                                            📍 ${chauffeur.adresse || 'Non spécifiée'}
+                                        </div>
+                                        <div style="display: flex; gap: 10px; font-size: 14px;">
+                                            <span style="background: #e3f2fd; color: #1976d2; padding: 3px 8px; border-radius: 10px;">
+                                                📅 ${chauffeur.stats.courses_aujourdhui} aujourd'hui
+                                            </span>
+                                            <span style="background: #e8f5e9; color: #388e3c; padding: 3px 8px; border-radius: 10px;">
+                                                ✅ ${chauffeur.stats.courses_validees} validées
+                                            </span>
+                                            <span style="background: #fff3e0; color: #f57c00; padding: 3px 8px; border-radius: 10px;">
+                                                💰 ${chauffeur.stats.revenu_total} €
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                                        <button onclick="toggleActif(${chauffeur.id}, ${chauffeur.actif})" 
+                                                class="${chauffeur.actif ? 'btn-desactiver' : 'btn-activer'}">
+                                            ${chauffeur.actif ? '❌ Désactiver' : '✅ Activer'}
+                                        </button>
+                                        <button onclick="toggleSuper(${chauffeur.id}, ${chauffeur.est_super})" 
+                                                class="btn-super">
+                                            ${chauffeur.est_super ? '👤 Retirer SUPER' : '👑 Donner SUPER'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">Aucun chauffeur trouvé</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+    
+    async function toggleActif(chauffeurId, estActif) {
+        if (!confirm(`Êtes-vous sûr de vouloir ${estActif ? 'désactiver' : 'activer'} ce chauffeur ?`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch('/mobile/api/super/chauffeurs/' + chauffeurId + '/toggle-actif/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(data.message);
+                loadChauffeurs(); // Recharger la liste
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        } catch (error) {
+            alert('Erreur réseau');
+        }
+    }
+    
+    async function toggleSuper(chauffeurId, estSuper) {
+        if (!confirm(`Êtes-vous sûr de vouloir ${estSuper ? 'retirer le statut SUPER' : 'donner le statut SUPER'} à ce chauffeur ?`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch('/mobile/api/super/chauffeurs/' + chauffeurId + '/toggle-super/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(data.message);
+                loadChauffeurs(); // Recharger la liste
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        } catch (error) {
+            alert('Erreur réseau');
+        }
+    }
+    
+    // Charger les chauffeurs au démarrage
+    loadChauffeurs();
+    </script>
+</body>
+</html>

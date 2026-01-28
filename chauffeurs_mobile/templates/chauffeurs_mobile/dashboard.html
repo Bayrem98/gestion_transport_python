@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Chauffeur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .user-info p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .value.positive {
+            color: #28a745;
+        }
+        
+        .section-title {
+            margin: 30px 0 20px 0;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .action-card i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .action-card h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .action-card p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .courses-list {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .course-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .course-item:last-child {
+            border-bottom: none;
+        }
+        
+        .course-time {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .course-type {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .course-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .status-a-faire {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .status-validee {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .status-terminee {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-attente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-demande {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .revenu-total {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .course-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-terminer {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .btn-valider {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn-annuler {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-validee {
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .course-actions {
+                justify-content: flex-start;
+            }
+            .super-card {
+                background: linear-gradient(135deg, #ff9800 0%,             #f57c00 100%) !important;
+                color: white !important;
+                border: 2px solid #ff9800 !important;
+            }
+
+            .super-card:hover {
+                transform: translateY(-5px) !important;
+                box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3) !            important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="user-info">
+                <h1 id="chauffeurName">Chargement...</h1>
+                <p id="currentDate"></p>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <span style="margin-right: 8px;">🚪</span> Déconnexion
+            </button>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <!-- Statistiques -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Courses aujourd'hui</h3>
+                <div class="value" id="statCoursesToday">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Validées</h3>
+                <div class="value positive" id="statValidees">0</div>
+            </div>
+            <div class="stat-card revenu-total">
+                <h3 style="color: white;">Revenu validé</h3>
+                <div class="value" id="statRevenu">0 €</div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <h2 class="section-title">Actions</h2>
+        <div class="actions-grid">
+            <a href="/mobile/selection/" class="action-card">
+                <div>📋</div>
+                <h3>Sélectionner agents</h3>
+                <p>Créer une nouvelle course</p>
+            </a>
+            
+            <!-- NOUVELLE CARTE RÉSERVATION J+1 -->
+            <a href="/mobile/reservation/" class="action-card">
+                <div style="color: #ff9800;">📅</div>
+                <h3>Réservation J+1</h3>
+                <p>Réserver les agents pour demain</p>
+            </a>
+            
+            <a href="/mobile/historique/" class="action-card">
+                <div>📊</div>
+                <h3>Historique</h3>
+                <p>Voir les courses du mois en cours</p>
+            </a>
+            
+            <a href="/mobile/profile/" class="action-card">
+                <div>👤</div>
+                <h3>Mon profil</h3>
+                <p>Informations personnelles</p>
+            </a>
+        </div>
+    <!-- NOUVELLE ACTION SUPER-CHAFFEUR -->
+    <div id="superChauffeurAction" style="display: none;">
+        <a href="/mobile/super/dashboard/" class="action-card" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white;">
+            <div>👑</div>
+            <h3>Super Dashboard</h3>
+            <p>Voir tous les chauffeurs et courses</p>
+        </a>
+    </div>
+</div>        
+        <!-- Courses d'aujourd'hui -->
+        <h2 class="section-title">Courses d'aujourd'hui <small>(à faire)</small></h2>
+        <div class="courses-list" id="coursesAujourdhui">
+            <div class="loading">
+                <p>Chargement des courses...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function formatDate(date) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('fr-FR', options);
+    }
+    
+    document.getElementById('currentDate').textContent = formatDate(new Date());
+    
+    // Fonction pour terminer une course
+    async function terminerCourse(courseId) {
+        if (confirm('Marquer cette course comme terminée ?')) {
+            try {
+                const response = await fetch('/mobile/api/course/terminer/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({course_id: courseId})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Course terminée');
+                    loadDashboardData();
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            } catch (error) {
+                alert('Erreur réseau');
+            }
+        }
+    }
+    
+    // Fonction pour demander validation
+    async function demanderValidation(courseId) {
+        const notes = prompt("Notes pour l'admin (optionnel):", "");
+        
+        try {
+            const response = await fetch('/mobile/api/course/demander-validation/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    course_id: courseId,
+                    notes: notes || ''
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Demande de validation envoyée');
+                loadDashboardData();
+            } else {
+                alert('❌ ' + data.error);
+            }
+        } catch (error) {
+            alert('Erreur réseau');
+        }
+    }
+    
+    // Fonction pour annuler une course
+    async function annulerCourse(courseId) {
+        if (confirm('Annuler cette course ? Cette action est irréversible.')) {
+            try {
+                const response = await fetch('/mobile/api/course/annuler/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({course_id: courseId})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Course annulée');
+                    loadDashboardData();
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            } catch (error) {
+                alert('Erreur réseau');
+            }
+        }
+    }
+    
+    // Fonction pour afficher les boutons d'action
+    function displayCourseActions(course) {
+        let actionsHtml = '';
+        
+        if (course.statut === 'en_attente' || course.statut === 'en_cours') {
+            actionsHtml += '<button class="action-btn btn-terminer" onclick="terminerCourse(' + course.id + ')">✓ Terminer</button>';
+        }
+        
+        if (course.statut === 'terminee') {
+            actionsHtml += '<button class="action-btn btn-valider" onclick="demanderValidation(' + course.id + ')">✅ Valider</button>';
+        }
+        
+        if (course.statut === 'demande_validation') {
+            actionsHtml += '<span style="color: #ff9800; font-size: 12px;">⏳ En attente validation admin</span>';
+        }
+        
+        if (course.statut === 'validee' || course.statut === 'payee') {
+            actionsHtml += '<span class="btn-validee">✅ Validée</span>';
+        }
+        
+        return actionsHtml;
+    }
+    
+    async function loadDashboardData() {
+        try {
+            console.log("📡 Chargement du dashboard...");
+            const response = await fetch('/mobile/api/dashboard/', {
+                credentials: 'include'
+            });
+            
+            const data = await response.json();
+            console.log("📊 Données dashboard reçues:", data);
+            
+            if (data.success) {
+                // Nom du chauffeur SEULEMENT
+                if (data.chauffeur && data.chauffeur.nom) {
+                    document.getElementById('chauffeurName').textContent = data.chauffeur.nom;
+                }
+    // NOUVEAU : Afficher le bouton Super Chauffeur si autorisé
+                if (data.chauffeur && data.chauffeur.super_chauffeur === true) {
+        document.getElementById('superChauffeurAction').style.display = 'block';
+        console.log("✅ Super chauffeur détecté - Bouton affiché");
+                } else {
+        console.log("ℹ️  Chauffeur normal - Pas de super accès");
+                }                
+                // Statistiques
+                if (data.dashboard && data.dashboard.stats) {
+                    const stats = data.dashboard.stats;
+                    
+                    // Courses aujourd'hui
+                    document.getElementById('statCoursesToday').textContent = stats.total_courses || 0;
+                    
+                    // Courses validées
+                    document.getElementById('statValidees').textContent = stats.courses_validees || 0;
+                    
+                    // Revenu validé
+                    const revenuElement = document.getElementById('statRevenu');
+                    if (stats.revenu_valide_display) {
+                        revenuElement.textContent = stats.revenu_valide_display;
+                    } else if (stats.revenu_valide !== undefined) {
+                        revenuElement.textContent = `${parseFloat(stats.revenu_valide || 0).toFixed(2)} €`;
+                    } else {
+                        revenuElement.textContent = "0.00 €";
+                    }
+                    
+                    // Date
+                    if (data.dashboard.date) {
+                        document.getElementById('currentDate').textContent = data.dashboard.date;
+                    }
+                }
+                
+                // Afficher courses d'aujourd'hui
+                const coursesContainer = document.getElementById('coursesAujourdhui');
+                if (data.dashboard && data.dashboard.courses_aujourdhui && 
+                    data.dashboard.courses_aujourdhui.length > 0) {
+                    
+                    let coursesHtml = '';
+                    data.dashboard.courses_aujourdhui.forEach(course => {
+                        // Déterminer la couleur selon le statut
+                        let statusClass = 'status-a-faire';
+                        let statusText = course.statut_display || course.statut;
+                        
+                        if (course.statut === 'validee' || course.statut === 'payee') {
+                            statusClass = 'status-validee';
+                        } else if (course.statut === 'terminee') {
+                            statusClass = 'status-terminee';
+                        } else if (course.statut === 'en_attente') {
+                            statusClass = 'status-attente';
+                        } else if (course.statut === 'demande_validation') {
+                            statusClass = 'status-demande';
+                        } else if (course.statut === 'annulee') {
+                            statusClass = 'status-annulee';
+                        }
+                        
+                        // Générer les boutons d'action
+                        let actionsHtml = '';
+                        
+                        if (course.statut === 'en_attente' || course.statut === 'en_cours') {
+                            actionsHtml += '<button class="action-btn btn-terminer" onclick="terminerCourse(' + course.id + ')">✓ Terminer</button>';
+                        }
+                        
+                        if (course.statut === 'terminee') {
+                            actionsHtml += '<button class="action-btn btn-valider" onclick="demanderValidation(' + course.id + ')">✅ Valider</button>';
+                        }
+                        
+                        if (course.statut === 'demande_validation') {
+                            actionsHtml += '<span style="color: #ff9800; font-size: 12px;">⏳ En attente validation admin</span>';
+                        }
+                        
+                        if (course.statut === 'validee' || course.statut === 'payee') {
+                            actionsHtml += '<span class="btn-validee">✅ Validée</span>';
+                        }
+                        
+                        coursesHtml += `
+                            <div class="course-item">
+                                <div style="flex: 1;">
+                                    <div class="course-time">${course.heure_display || course.heure}</div>
+                                    <div class="course-type">${course.type_display || course.type}</div>
+                                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                        ${course.nb_agents} agent(s) • ${course.prix ? parseFloat(course.prix).toFixed(2) + ' €' : 'Prix non défini'}
+                                    </div>
+                                    <div class="course-actions">${actionsHtml}</div>
+                                </div>
+                                <div class="course-status ${statusClass}">
+                                    ${statusText}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    coursesContainer.innerHTML = coursesHtml;
+                    
+                } else {
+                    coursesContainer.innerHTML = `
+                        <div class="no-data">
+                            <p>📭 Aucune course programmée aujourd'hui</p>
+                            <p style="margin-top: 10px;">
+                                <a href="/mobile/selection/" style="color: #667eea; text-decoration: none;">
+                                    ➕ Créer une course
+                                </a>
+                            </p>
+                        </div>
+                    `;
+                }
+                
+            } else {
+                // Erreur d'authentification
+                if (data.message && data.message.includes('Session')) {
+                    console.log("🔐 Session expirée, redirection vers login");
+                    window.location.href = '/mobile/login/';
+                } else {
+                    coursesContainer.innerHTML = '<div class="error">' + (data.message || 'Erreur de chargement') + '</div>';
+                }
+            }
+            
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            const coursesContainer = document.getElementById('coursesAujourdhui');
+            coursesContainer.innerHTML = '<div class="error">Erreur de connexion au serveur</div>';
+        }
+    }
+    
+    async function logout() {
+        if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+            try {
+                const response = await fetch('/mobile/api/logout/', { 
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Déconnecté:', data);
+                }
+                
+            } catch (error) {
+                console.error('Erreur déconnexion:', error);
+            }
+            
+            // Redirection après 500ms pour laisser le temps à la requête
+            setTimeout(() => {
+                window.location.href = '/mobile/login/';
+            }, 500);
+        }
+    }
+    
+    // Charger les données au démarrage
+    loadDashboardData();
+    
+    // Rafraîchir toutes les 2 minutes
+    setInterval(loadDashboardData, 120000);
+    </script>
+</body>
+</html>

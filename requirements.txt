@@ -1,0 +1,15 @@
+Django==4.2.7
+pandas==2.2.0
+openpyxl==3.1.2
+reportlab==4.0.4
+python-dotenv==1.0.0
+django-crispy-forms==2.0
+crispy-bootstrap5==0.7
+geopy==2.4.0
+folium==0.14.0
+requests==2.31.0
+numpy==1.26.4
+python-decouple==3.8
+django-leaflet==0.28.0
+djangorestframework==3.14.0
+django-cors-headers==4.2.0

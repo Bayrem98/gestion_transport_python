@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sélection Agents - Aujourd'hui</title>
+    <style>
+        /* ===== VARIABLES & RESET ===== */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --info: #4299e1;
+            --light: #f7fafc;
+            --dark: #2d3748;
+            --gray: #a0aec0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 10px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 25px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* ===== FILTRES ===== */
+        .filters-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-label i {
+            color: var(--primary);
+        }
+        
+        .filter-input {
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: var(--light);
+        }
+        
+        .filter-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* ===== STATISTIQUES ===== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* ===== AGENTS GRID ===== */
+        .agents-section {
+            margin-top: 40px;
+        }
+        
+        .section-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        /* ===== CARTE AGENT ===== */
+        .agent-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .agent-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .agent-card.selected {
+            border: 3px solid var(--success);
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2);
+        }
+        
+        /* Ribbon pour réservé */
+        .ribbon {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        /* Header carte */
+        .agent-header {
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        }
+        
+        .agent-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .agent-company {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 5px 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        /* Body carte */
+        .agent-body {
+            padding: 25px;
+        }
+        
+        .agent-info {
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #4a5568;
+        }
+        
+        .info-icon {
+            margin-right: 12px;
+            color: var(--primary);
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Badge de statut */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+        
+        .status-reserve {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .status-mine {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+        
+        /* Bouton sélection */
+        .select-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        
+        .select-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .select-btn.selected {
+            background: linear-gradient(135deg, var(--success) 0%, #38a169 100%);
+        }
+        
+        .select-btn:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Footer carte */
+        .agent-footer {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .agent-id {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* ===== RÉSUMÉ SÉLECTION ===== */
+        .selection-summary {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 40px;
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+            border: 3px solid var(--primary);
+        }
+        
+        .summary-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .summary-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .summary-count {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0 10px;
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .confirm-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+        }
+        
+        .confirm-btn:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* ===== ÉTATS ===== */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--gray);
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+            text-align: center;
+            border-left: 4px solid #f56565;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: var(--gray);
+        }
+        
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .summary-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .confirm-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .filters-card,
+            .agent-card {
+                padding: 20px;
+            }
+        }
+        
+        /* ===== ANIMATIONS ===== */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">👥</div>
+                <div class="logo-text">
+                    <h1>Sélection des Agents</h1>
+                    <p>Choisissez les agents à transporter pour aujourd'hui</p>
+                </div>
+            </div>
+            <a href="/mobile/dashboard/" class="back-btn">
+                ← Retour au dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- FILTRES -->
+        <div class="filters-card fade-in">
+            <div class="card-title">
+                <span>🔍</span>
+                Critères de recherche
+            </div>
+            
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <span>📅</span>
+                        Date
+                    </label>
+                    <input type="date" id="date" class="filter-input" readonly style="background-color: #f0f4ff;">
+                    <small style="color: var(--gray); font-size: 12px; margin-top: 5px;">Uniquement pour aujourd'hui</small>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <span>🚗</span>
+                        Type de transport
+                    </label>
+                    <select id="type" class="filter-input" required>
+                        <option value="ramassage">Ramassage</option>
+                        <option value="depart">Départ</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <span>⏰</span>
+                        Heure
+                    </label>
+                    <select id="heure" class="filter-input" required>
+                        <option value="6">06:00</option>
+                        <option value="7">07:00</option>
+                        <option value="8">08:00</option>
+                        <option value="22">22:00</option>
+                        <option value="23">23:00</option>
+                        <option value="0">00:00</option>
+                        <option value="1">01:00</option>
+                        <option value="2">02:00</option>
+                        <option value="3">03:00</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="search-btn" onclick="searchAgents()">
+                🔍 Rechercher les agents
+                <span style="font-size: 12px; opacity: 0.9;">(pour aujourd'hui)</span>
+            </button>
+        </div>
+        
+        <!-- STATISTIQUES -->
+        <div class="stats-container" id="statsContainer" style="display: none;">
+            <div class="stat-card fade-in">
+                <div class="stat-icon">📅</div>
+                <div class="stat-value" id="statReserves">0</div>
+                <div class="stat-label">Réservés</div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statDisponibles">0</div>
+                <div class="stat-label">Disponibles</div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="statSelectionnes">0</div>
+                <div class="stat-label">Sélectionnés</div>
+            </div>
+        </div>
+        
+        <!-- AGENTS -->
+        <div class="agents-section">
+            <div class="section-header">
+                <span>👥</span>
+                Liste des agents
+            </div>
+            
+            <div id="agentsResults">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Chargement des agents...</p>
+                    <p style="margin-top: 10px; color: var(--gray);">
+                        Sélectionnez des critères pour voir les agents disponibles
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RÉSUMÉ SÉLECTION -->
+        <div class="selection-summary" id="selectionSummary" style="display: none;">
+            <div class="summary-content">
+                <div class="summary-text">
+                    <span id="selectedCount">0</span> agent(s) sélectionné(s)
+                </div>
+                <button class="confirm-btn" id="confirmBtn" onclick="confirmSelection()" disabled>
+                    ✅ Confirmer la sélection
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let selectedAgents = new Set();
+    
+    // Initialiser la date d'aujourd'hui
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    
+    // Fonction pour rechercher les agents
+    async function searchAgents() {
+        const date = document.getElementById('date').value;
+        const type = document.getElementById('type').value;
+        const heure = document.getElementById('heure').value;
+        
+        if (!date || !type || !heure) {
+            showError('Veuillez remplir tous les critères');
+            return;
+        }
+        
+        // Vider la sélection
+        selectedAgents.clear();
+        updateSelectionSummary();
+        
+        const resultsDiv = document.getElementById('agentsResults');
+        resultsDiv.innerHTML = `
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Recherche des agents pour aujourd'hui...</p>
+            </div>
+        `;
+        
+        try {
+            const response = await fetch(
+                `/mobile/api/agents/disponibles/?date=${date}&heure=${heure}&type_transport=${type}`
+            );
+            const data = await response.json();
+            
+            if (data.success) {
+                displayAgentsResults(data);
+            } else {
+                showError(data.error || 'Erreur de recherche');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            showError('Erreur de connexion au serveur');
+        }
+    }
+    
+    // Afficher les résultats
+    function displayAgentsResults(data) {
+        const resultsDiv = document.getElementById('agentsResults');
+        const statsContainer = document.getElementById('statsContainer');
+        
+        // Afficher les statistiques
+        statsContainer.style.display = 'grid';
+        document.getElementById('statReserves').textContent = data.stats?.reserves || 0;
+        document.getElementById('statDisponibles').textContent = data.stats?.disponibles || 0;
+        document.getElementById('statTotal').textContent = data.stats?.total || 0;
+        document.getElementById('statSelectionnes').textContent = selectedAgents.size;
+        
+        if (data.agents && data.agents.length > 0) {
+            let html = '';
+            
+            // Parcourir tous les agents
+            data.agents.forEach(agent => {
+                const isSelected = selectedAgents.has(agent.id);
+                const isReserved = agent.est_reserve;
+                const isMine = agent.est_mien;
+                
+                html += `
+                    <div class="agent-card fade-in ${isSelected ? 'selected' : ''}">
+                        ${isReserved ? `<div class="ribbon">Réservé</div>` : ''}
+                        
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-name">
+                                    ${agent.nom}
+                                    ${isMine ? '<span style="color: var(--success);">(Votre réservation)</span>' : ''}
+                                </div>
+                                <div class="agent-company">${agent.societe || 'Non spécifié'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="agent-body">
+                            <div class="agent-info">
+                                <div class="info-item">
+                                    <span class="info-icon">📍</span>
+                                    <span>${agent.adresse || 'Non spécifiée'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📞</span>
+                                    <span>${agent.telephone || 'Non spécifié'}</span>
+                                </div>
+                            </div>
+                            
+                            ${isReserved ? `
+                                <div class="status-badge ${isMine ? 'status-mine' : 'status-reserve'}">
+                                    ${isMine ? '✓ Votre réservation' : (agent.chauffeur_nom ? `Réservé par ${agent.chauffeur_nom}` : 'Réservé')}
+                                </div>
+                            ` : ''}
+                            
+                            <button class="select-btn ${isSelected ? 'selected' : ''}" 
+                                    id="select-btn-${agent.id}"
+                                    onclick="toggleAgent(${agent.id})"
+                                    ${agent.est_affecte ? 'disabled' : ''}>
+                                ${agent.est_affecte ? '🚗 Déjà transporté' : 
+                                  isSelected ? '✓ Sélectionné' : 
+                                  '➕ Sélectionner'}
+                            </button>
+                        </div>
+                        
+                        <div class="agent-footer">
+                            <div class="agent-id">#${agent.id}</div>
+                            <div style="font-size: 12px; color: var(--gray);">
+                                ${agent.est_complet ? '✅ Infos complètes' : '⚠️ Infos manquantes'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = `<div class="agents-grid">${html}</div>`;
+            
+        } else {
+            resultsDiv.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">👥</div>
+                    <p>Aucun agent disponible pour ces critères</p>
+                    <p style="margin-top: 15px;">
+                        <a href="/mobile/reservation/" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            📅 Réservez des agents pour demain
+                        </a>
+                    </p>
+                </div>
+            `;
+        }
+    }
+    
+    // Toggle la sélection d'un agent
+    function toggleAgent(agentId) {
+        const btn = document.getElementById(`select-btn-${agentId}`);
+        
+        if (selectedAgents.has(agentId)) {
+            selectedAgents.delete(agentId);
+            btn.classList.remove('selected');
+            btn.textContent = btn.textContent.replace('✓ ', '➕ ');
+        } else {
+            selectedAgents.add(agentId);
+            btn.classList.add('selected');
+            btn.textContent = '✓ Sélectionné';
+        }
+        
+        updateSelectionSummary();
+    }
+    
+    // Mettre à jour le résumé
+    function updateSelectionSummary() {
+        const summaryDiv = document.getElementById('selectionSummary');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const statSelectionnes = document.getElementById('statSelectionnes');
+        
+        statSelectionnes.textContent = selectedAgents.size;
+        
+        if (selectedAgents.size > 0) {
+            summaryDiv.style.display = 'block';
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = `✅ Confirmer (${selectedAgents.size} agent(s))`;
+        } else {
+            summaryDiv.style.display = 'block';
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '✅ Confirmer la sélection';
+        }
+    }
+    
+    // Confirmer la sélection
+    async function confirmSelection() {
+        if (selectedAgents.size === 0) {
+            showError('Veuillez sélectionner au moins un agent');
+            return;
+        }
+        
+        const date = document.getElementById('date').value;
+        const type = document.getElementById('type').value;
+        const heure = document.getElementById('heure').value;
+        
+        const agentsList = Array.from(selectedAgents);
+        
+        if (confirm(`Créer une course avec ${agentsList.length} agent(s) pour aujourd'hui ?`)) {
+            try {
+                // Afficher chargement
+                const confirmBtn = document.getElementById('confirmBtn');
+                const originalText = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = '⏳ Création en cours...';
+                confirmBtn.disabled = true;
+                
+                const response = await fetch('/mobile/api/course/creer/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        date: date,
+                        type_transport: type,
+                        heure: heure,
+                        agents: agentsList
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ Course créée avec succès !\n${data.message}`);
+                    window.location.href = '/mobile/dashboard/';
+                } else {
+                    showError(data.error || 'Impossible de créer la course');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                showError('Erreur de connexion au serveur');
+            } finally {
+                const confirmBtn = document.getElementById('confirmBtn');
+                confirmBtn.innerHTML = '✅ Confirmer la sélection';
+                confirmBtn.disabled = false;
+            }
+        }
+    }
+    
+    // Afficher une erreur
+    function showError(message) {
+        const resultsDiv = document.getElementById('agentsResults');
+        resultsDiv.innerHTML = `
+            <div class="error">
+                <strong>❌ Erreur</strong><br>
+                ${message}
+            </div>
+        `;
+    }
+    
+    // Chargement automatique
+    window.addEventListener('load', function() {
+        // Attendre un peu pour un meilleur effet visuel
+        setTimeout(() => {
+            searchAgents();
+        }, 500);
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_12a49bac3a217657d7f4690d86f50867 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.2/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.2/Control.FullScreen.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+</head>
+<body>
+    
+    
+        <div style="position: fixed; bottom: 50px; left: 50px; z-index: 1000;
+                    background: white; padding: 10px; border-radius: 5px;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.2); font-size: 12px;">
+            <h4 style="margin: 0 0 8px 0;">Ramassage 22h - yasser ncir - Départ: Complexe Zaoui</h4>
+            <div>🟢 Départ: DÉPART FIXE - Comple</div>
+            <div>🔴 Arrivée: Alice (Rabeb ANIZI)</div>
+            <div>🔵 Points: 3</div>
+            <div>📏 Distance: 1.52 km</div>
+            <div>⏱️ Temps estimé: 0.5 min</div>
+            <div>💰 Économie: 0.05 km</div>
+        </div>
+        
+    
+            <div class="folium-map" id="map_12a49bac3a217657d7f4690d86f50867" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_12a49bac3a217657d7f4690d86f50867 = L.map(
+                "map_12a49bac3a217657d7f4690d86f50867",
+                {
+                    center: [35.82947513370598, 10.636920879334527],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 12,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+            L.control.scale().addTo(map_12a49bac3a217657d7f4690d86f50867);
+
+            
+
+        
+    
+            var tile_layer_a597cd2a60bdebbb983bd3ce5265afc1 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+                {"attribution": "\u00a9 OpenStreetMap France", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_12a49bac3a217657d7f4690d86f50867);
+        
+    
+            var marker_8d187441f44bdfc767b2b24b827c0f51 = L.marker(
+                [35.8342, 10.6296],
+                {}
+            ).addTo(map_12a49bac3a217657d7f4690d86f50867);
+        
+    
+            var icon_c7dcd8540a8347370ac7125a09406dbe = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "play", "iconColor": "white", "markerColor": "green", "prefix": "fa"}
+            );
+            marker_8d187441f44bdfc767b2b24b827c0f51.setIcon(icon_c7dcd8540a8347370ac7125a09406dbe);
+        
+    
+        var popup_ae55d76d80f64c6e19bb65cd679f3ab7 = L.popup({"maxWidth": 250});
+
+        
+            
+                var html_da6da1ea75164e4048bfac9b5f7954c4 = $(`<div id="html_da6da1ea75164e4048bfac9b5f7954c4" style="width: 100.0%; height: 100.0%;">             <div style="width: 220px;">                 <div style="background: #2c3e50; color: white; padding: 6px 10px; border-radius: 4px 4px 0 0;">                     <strong>#0 - DÉPART FIXE - Complexe Zaoui</strong>                 </div>                 <div style="padding: 8px;">                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-map-marker"></i> rue rabat complexe zaoui sousse 4000                     </p>                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-building"></i> POINT DE DÉPART                     </p>                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-phone"></i>                      </p>                     <hr style="margin: 6px 0;">                     <p style="margin: 4px 0; font-size: 11px; color: #666;">                         Lat: 35.83420<br>                         Lon: 10.62960                     </p>                 </div>             </div>             </div>`)[0];
+                popup_ae55d76d80f64c6e19bb65cd679f3ab7.setContent(html_da6da1ea75164e4048bfac9b5f7954c4);
+            
+        
+
+        marker_8d187441f44bdfc767b2b24b827c0f51.bindPopup(popup_ae55d76d80f64c6e19bb65cd679f3ab7)
+        ;
+
+        
+    
+    
+            marker_8d187441f44bdfc767b2b24b827c0f51.bindTooltip(
+                `<div>
+                     DÉPART: DÉPART FIXE - Complexe Zaoui
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_70af11a50227de923634272b037dfc27 = L.marker(
+                [35.82655866033801, 10.63888831209211],
+                {}
+            ).addTo(map_12a49bac3a217657d7f4690d86f50867);
+        
+    
+            var icon_307441aba8d7f208bafaf8d84f369c51 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "circle", "iconColor": "white", "markerColor": "blue", "prefix": "fa"}
+            );
+            marker_70af11a50227de923634272b037dfc27.setIcon(icon_307441aba8d7f208bafaf8d84f369c51);
+        
+    
+        var popup_f193538cd2115fd6b226be885ba65211 = L.popup({"maxWidth": 250});
+
+        
+            
+                var html_761a7451286b32a69f6023d4572ae65a = $(`<div id="html_761a7451286b32a69f6023d4572ae65a" style="width: 100.0%; height: 100.0%;">             <div style="width: 220px;">                 <div style="background: #2c3e50; color: white; padding: 6px 10px; border-radius: 4px 4px 0 0;">                     <strong>#1 - Alexia (Amal DAOUTHI)</strong>                 </div>                 <div style="padding: 8px;">                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-map-marker"></i> Rue baghded n°4 oued laarouk                     </p>                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-building"></i> Ulysse                     </p>                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-phone"></i> 21654748900.0                     </p>                     <hr style="margin: 6px 0;">                     <p style="margin: 4px 0; font-size: 11px; color: #666;">                         Lat: 35.82656<br>                         Lon: 10.63889                     </p>                 </div>             </div>             </div>`)[0];
+                popup_f193538cd2115fd6b226be885ba65211.setContent(html_761a7451286b32a69f6023d4572ae65a);
+            
+        
+
+        marker_70af11a50227de923634272b037dfc27.bindPopup(popup_f193538cd2115fd6b226be885ba65211)
+        ;
+
+        
+    
+    
+            marker_70af11a50227de923634272b037dfc27.bindTooltip(
+                `<div>
+                     #2: Alexia (Amal DAOUTHI)
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_ac177fa8dda11b110c389ae37b1b5fc2 = L.marker(
+                [35.82766674077991, 10.642274325911469],
+                {}
+            ).addTo(map_12a49bac3a217657d7f4690d86f50867);
+        
+    
+            var icon_7f1ef855b05f709e6273749828991bd2 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "flag-checkered", "iconColor": "white", "markerColor": "red", "prefix": "fa"}
+            );
+            marker_ac177fa8dda11b110c389ae37b1b5fc2.setIcon(icon_7f1ef855b05f709e6273749828991bd2);
+        
+    
+        var popup_c1ba6af02eb251ecba5a232de97917ed = L.popup({"maxWidth": 250});
+
+        
+            
+                var html_08309e3bcfb1c022bcf5ea5bc21cc4e9 = $(`<div id="html_08309e3bcfb1c022bcf5ea5bc21cc4e9" style="width: 100.0%; height: 100.0%;">             <div style="width: 220px;">                 <div style="background: #2c3e50; color: white; padding: 6px 10px; border-radius: 4px 4px 0 0;">                     <strong>#2 - Alice (Rabeb ANIZI)</strong>                 </div>                 <div style="padding: 8px;">                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-map-marker"></i> 246 rue dr skandarani cité zahra                     </p>                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-building"></i> Hannibal                     </p>                     <p style="margin: 4px 0; font-size: 12px;">                         <i class="fa fa-phone"></i> 23539887.0                     </p>                     <hr style="margin: 6px 0;">                     <p style="margin: 4px 0; font-size: 11px; color: #666;">                         Lat: 35.82767<br>                         Lon: 10.64227                     </p>                 </div>             </div>             </div>`)[0];
+                popup_c1ba6af02eb251ecba5a232de97917ed.setContent(html_08309e3bcfb1c022bcf5ea5bc21cc4e9);
+            
+        
+
+        marker_ac177fa8dda11b110c389ae37b1b5fc2.bindPopup(popup_c1ba6af02eb251ecba5a232de97917ed)
+        ;
+
+        
+    
+    
+            marker_ac177fa8dda11b110c389ae37b1b5fc2.bindTooltip(
+                `<div>
+                     ARRIVÉE: Alice (Rabeb ANIZI)
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var poly_line_e471e3397e44ef19eb0409b70af6ca6f = L.polyline(
+                [[35.8342, 10.6296], [35.82655866033801, 10.63888831209211], [35.82766674077991, 10.642274325911469]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": "5, 5", "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_12a49bac3a217657d7f4690d86f50867);
+        
+    
+        var popup_887fb9b470e133f2a20cabafe13d9b5a = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_2c25f1deb6240b7b8f232996f14b6983 = $(`<div id="html_2c25f1deb6240b7b8f232996f14b6983" style="width: 100.0%; height: 100.0%;">Itinéraire: 1.52 km</div>`)[0];
+                popup_887fb9b470e133f2a20cabafe13d9b5a.setContent(html_2c25f1deb6240b7b8f232996f14b6983);
+            
+        
+
+        poly_line_e471e3397e44ef19eb0409b70af6ca6f.bindPopup(popup_887fb9b470e133f2a20cabafe13d9b5a)
+        ;
+
+        
+    
+    
+            L.control.fullscreen(
+                {"forceSeparateButton": false, "position": "topleft", "title": "Full Screen", "titleCancel": "Exit Full Screen"}
+            ).addTo(map_12a49bac3a217657d7f4690d86f50867);
+        
+    
+            var measure_control_652ec71d18052822e478176412eaaf72 = new L.Control.Measure(
+                {"position": "topright", "primaryAreaUnit": "sqmeters", "primaryLengthUnit": "meters", "secondaryAreaUnit": "acres", "secondaryLengthUnit": "miles"});
+            map_12a49bac3a217657d7f4690d86f50867.addControl(measure_control_652ec71d18052822e478176412eaaf72);
+
+        
+</script>
+</html>

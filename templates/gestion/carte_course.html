@@ -1,0 +1,474 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Carte Course #{{ course.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <!-- En-tête simplifiée -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-map-marked-alt me-2"></i>
+                Carte de la Course #{{ course.id }}
+            </h4>
+            <div>
+                <a href="{% url 'chauffeurs' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Retour
+                </a>
+                <button id="reload-btn" class="btn btn-light btn-sm ms-2">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Informations cours -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th width="120">Chauffeur:</th>
+                            <td>{{ course.chauffeur.nom }}</td>
+                        </tr>
+                        <tr>
+                            <th>Type:</th>
+                            <td>{{ course.get_type_transport_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Heure:</th>
+                            <td>{{ course.heure }}h</td>
+                        </tr>
+                        <tr>
+                            <th>Date:</th>
+                            <td>{{ course.date_reelle|date:"d/m/Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-flag-checkered me-2"></i>
+                        <strong>Point de départ:</strong> Complexe Zaoui, Sousse
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Conteneur principal carte -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-0 position-relative" style="min-height: 500px;">
+                            <!-- Indicateur de chargement -->
+                            <div id="loading" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Chargement de la carte...</p>
+                            </div>
+                            
+                            <!-- La carte Leaflet -->
+                            <div id="map" style="height: 500px; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Panneau d'info -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="fas fa-info-circle me-1"></i> Informations</h6>
+                        </div>
+                        <div class="card-body" id="info-panel">
+                            <div id="stats-content">
+                                <p><i class="fas fa-spinner fa-spin me-1"></i> Chargement...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Liste agents -->
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="fas fa-users me-1"></i> Agents</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush" id="agents-list">
+                                {% for affectation in affectations %}
+                                <div class="list-group-item" data-lat="{{ affectation.agent.latitude|default:'35.8320' }}" 
+                                     data-lng="{{ affectation.agent.longitude|default:'10.6280' }}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>{{ affectation.agent.nom }}</strong>
+                                            <div class="small text-muted">{{ affectation.agent.get_societe_display }}</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary btn-focus">
+                                            <i class="fas fa-crosshairs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="list-group-item text-center text-muted">
+                                    Aucun agent
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet CSS/JS - CHARGEMENT SYNCHRONE -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script>
+// Configuration globale
+const COURSE_ID = {{ course.id }};
+const API_URL = `/chauffeurs/api/carte_course/${COURSE_ID}/`;
+
+// Variables globales
+let map = null;
+let markers = [];
+let routeLine = null;
+
+// Initialisation quand la page est prête
+$(document).ready(function() {
+    console.log('Initialisation de la carte pour la course', COURSE_ID);
+    
+    // 1. Créer la carte IMMÉDIATEMENT
+    initMap();
+    
+    // 2. Charger les données
+    loadCourseData();
+    
+    // 3. Configurer les boutons
+    $('#reload-btn').click(function() {
+        clearMap();
+        loadCourseData();
+    });
+    
+    // 4. Boutons de focus sur agents
+    $('.btn-focus').click(function() {
+        const $item = $(this).closest('.list-group-item');
+        const lat = parseFloat($item.data('lat'));
+        const lng = parseFloat($item.data('lng'));
+        if (!isNaN(lat) && !isNaN(lng)) {
+            map.setView([lat, lng], 15);
+        }
+    });
+});
+
+// 1. INITIALISATION SIMPLE DE LA CARTE
+function initMap() {
+    console.log('Création de la carte...');
+    
+    // Centre par défaut (Complexe Zaoui)
+    map = L.map('map', {
+        center: [35.8320, 10.6280],
+        zoom: 13,
+        zoomControl: true
+    });
+    
+    // Ajouter les tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+    }).addTo(map);
+    
+    console.log('Carte créée avec succès');
+}
+
+// 2. CHARGEMENT DES DONNÉES
+function loadCourseData() {
+    console.log('Chargement des données...');
+    
+    // Afficher le chargement
+    $('#loading').show();
+    $('#stats-content').html('<p><i class="fas fa-spinner fa-spin"></i> Chargement...</p>');
+    
+    // Appel API
+    $.ajax({
+        url: API_URL,
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Données reçues:', response);
+            $('#loading').hide();
+            
+            if (response.success) {
+                displayData(response);
+            } else {
+                showError(response.error || 'Erreur inconnue');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erreur API:', error);
+            $('#loading').hide();
+            showError('Erreur de connexion: ' + error);
+            
+            // Afficher au moins le point de départ
+            displayDefaultPoint();
+        }
+    });
+}
+
+// 3. AFFICHER LES DONNÉES
+function displayData(data) {
+    // Nettoyer la carte
+    clearMap();
+    
+    const points = [];
+    const coordinates = [];
+    
+    // Ajouter le point de départ
+    const departure = {
+        name: 'DÉPART - Complexe Zaoui',
+        lat: 35.8320,
+        lng: 10.6280,
+        type: 'depart',
+        address: 'Rue Rabat, Complexe Zaoui, Sousse 4000'
+    };
+    points.push(departure);
+    
+    // Ajouter les agents
+    if (data.points && data.points.length > 0) {
+        data.points.forEach((point, index) => {
+            if (point.latitude && point.longitude) {
+                points.push({
+                    name: point.nom || `Agent ${index + 1}`,
+                    lat: point.latitude,
+                    lng: point.longitude,
+                    type: 'agent',
+                    address: point.adresse || '',
+                    company: point.societe || '',
+                    phone: point.telephone || ''
+                });
+            }
+        });
+    }
+    
+    console.log(`Affichage de ${points.length} points`);
+    
+    // Ajouter les marqueurs
+    points.forEach((point, index) => {
+        const marker = createMarker(point, index);
+        if (marker) {
+            marker.addTo(map);
+            markers.push(marker);
+            coordinates.push([point.lat, point.lng]);
+        }
+    });
+    
+    // Dessiner l'itinéraire
+    if (coordinates.length > 1) {
+        routeLine = L.polyline(coordinates, {
+            color: '#007bff',
+            weight: 3,
+            opacity: 0.7,
+            dashArray: '5, 5'
+        }).addTo(map);
+        
+        // Ajuster la vue
+        map.fitBounds(routeLine.getBounds(), { padding: [20, 20] });
+    } else if (coordinates.length === 1) {
+        map.setView(coordinates[0], 14);
+    }
+    
+    // Mettre à jour les infos
+    updateInfoPanel(data);
+}
+
+// 4. CRÉER UN MARQUEUR SIMPLE
+function createMarker(point, index) {
+    // Couleur selon le type
+    const color = point.type === 'depart' ? '#28a745' : '#007bff';
+    const iconText = point.type === 'depart' ? 'D' : (index);
+    
+    // Icône simple
+    const icon = L.divIcon({
+        html: `<div style="background: ${color}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${iconText}</div>`,
+        className: 'custom-marker',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+    
+    // Créer le marqueur
+    const marker = L.marker([point.lat, point.lng], { icon: icon });
+    
+    // Contenu du popup
+    const popupContent = `
+        <div style="min-width: 200px;">
+            <div style="background: ${color}; color: white; padding: 8px 12px; border-radius: 4px 4px 0 0;">
+                <strong>${point.type === 'depart' ? '🚗 DÉPART' : '👤 POINT ' + index}</strong>
+            </div>
+            <div style="padding: 10px;">
+                <h6 style="margin: 0 0 5px 0; font-size: 14px;">${point.name}</h6>
+                <p style="margin: 0 0 3px 0; font-size: 12px;">${point.address || ''}</p>
+                ${point.company ? `<p style="margin: 0 0 3px 0; font-size: 12px;"><strong>Société:</strong> ${point.company}</p>` : ''}
+                ${point.phone ? `<p style="margin: 0 0 3px 0; font-size: 12px;"><strong>Tél:</strong> ${point.phone}</p>` : ''}
+                <hr style="margin: 5px 0;">
+                <p style="margin: 0; font-size: 11px; color: #666;">
+                    Lat: ${point.lat.toFixed(5)}<br>
+                    Lng: ${point.lng.toFixed(5)}
+                </p>
+            </div>
+        </div>
+    `;
+    
+    marker.bindPopup(popupContent);
+    return marker;
+}
+
+// 5. POINT DE DÉPART PAR DÉFAUT
+function displayDefaultPoint() {
+    const point = {
+        name: 'COMPLEXE ZAOUI',
+        lat: 35.8320,
+        lng: 10.6280,
+        type: 'depart',
+        address: 'Rue Rabat, Complexe Zaoui, Sousse 4000'
+    };
+    
+    const marker = createMarker(point, 0);
+    marker.addTo(map);
+    markers.push(marker);
+    
+    map.setView([point.lat, point.lng], 14);
+    
+    $('#stats-content').html(`
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Données limitées</strong><br>
+            Affichage du point de départ uniquement.
+        </div>
+    `);
+}
+
+// 6. METTRE À JOUR LE PANEL D'INFO
+function updateInfoPanel(data) {
+    const distance = data.distance_totale || 0;
+    const agents = data.nombre_agents || 0;
+    const time = data.temps_estime || Math.round(distance / 40 * 60);
+    
+    const html = `
+        <div class="text-center mb-3">
+            <h4 class="text-primary">${distance} km</h4>
+            <small class="text-muted">Distance totale</small>
+        </div>
+        
+        <div class="row text-center">
+            <div class="col-6 mb-2">
+                <div class="border rounded p-2">
+                    <div class="h5 mb-1">${agents}</div>
+                    <small>Points</small>
+                </div>
+            </div>
+            <div class="col-6 mb-2">
+                <div class="border rounded p-2">
+                    <div class="h5 mb-1">${time}</div>
+                    <small>Minutes</small>
+                </div>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="small">
+            <p><i class="fas fa-car me-1"></i> <strong>Départ:</strong> Complexe Zaoui</p>
+            <p><i class="fas fa-clock me-1"></i> <strong>Heure:</strong> ${data.heure || '?'}h</p>
+            <p><i class="fas fa-calendar me-1"></i> <strong>Date:</strong> ${data.date || '?'}</p>
+        </div>
+    `;
+    
+    $('#stats-content').html(html);
+}
+
+// 7. NETTOYER LA CARTE
+function clearMap() {
+    markers.forEach(marker => {
+        if (map && marker) {
+            map.removeLayer(marker);
+        }
+    });
+    markers = [];
+    
+    if (routeLine && map) {
+        map.removeLayer(routeLine);
+        routeLine = null;
+    }
+}
+
+// 8. AFFICHER ERREUR
+function showError(message) {
+    $('#stats-content').html(`
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Erreur:</strong> ${message}
+            <br>
+            <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadCourseData()">
+                <i class="fas fa-sync-alt me-1"></i> Réessayer
+            </button>
+        </div>
+    `);
+}
+</script>
+
+<style>
+/* Styles ESSENTIELS pour la carte */
+#map {
+    height: 500px !important;
+    width: 100% !important;
+    z-index: 1;
+}
+
+#loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Marqueurs personnalisés */
+.custom-marker {
+    transition: transform 0.2s;
+}
+
+.custom-marker:hover {
+    transform: scale(1.2);
+}
+
+/* Popup */
+.leaflet-popup-content {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 250px !important;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    #map {
+        height: 400px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #map {
+        height: 300px !important;
+    }
+}
+</style>
+{% endblock %}
