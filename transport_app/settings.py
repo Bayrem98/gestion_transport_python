@@ -7,7 +7,12 @@ SECRET_KEY = 'django-insecure-votre-cle-secrete-ici'
 POSITIONSTACK_API_KEY = '88bcabc4997f720becd5cb84b44c7b6e'
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1',
+    'gestion-transport-app-web.onrender.com',  # AJOUTEZ CECI
+    '*.onrender.com',  # ET CECI pour tous les sous-domaines Render
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
