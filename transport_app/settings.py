@@ -1,8 +1,14 @@
 import os
-import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+try:
+    import dj_database_url
+    DJ_DATABASE_URL_AVAILABLE = True
+except ImportError:
+    DJ_DATABASE_URL_AVAILABLE = False
+    print("⚠️ dj-database-url non installé, utilisation de SQLite par défaut")
 
 SECRET_KEY = 'django-insecure-votre-cle-secrete-ici'
 POSITIONSTACK_API_KEY = '88bcabc4997f720becd5cb84b44c7b6e'
@@ -63,30 +69,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'transport_app.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DJ_DATABASE_URL_AVAILABLE and 'DATABASE_URL' in os.environ:
+    # Utilise PostgreSQL sur Render
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='sqlite:///db.sqlite3',
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True
+        )
     }
-}
+    print("✅ Configuration PostgreSQL détectée")
+else:
+    # Utilise SQLite en local ou si dj-database-url n'est pas installé
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    print("⚠️ Utilisation de SQLite (local ou fallback)")
 
-# Sur Render, utilise PostgreSQL
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True
-    )
-
-# Ou plus simple :
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True
-    )
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
