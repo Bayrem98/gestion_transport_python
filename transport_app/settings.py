@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+import dj_database_url
+from dotenv import load_dotenv
+load_dotenv() 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -69,11 +72,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'transport_app.wsgi.application'
 
-if DJ_DATABASE_URL_AVAILABLE and 'DATABASE_URL' in os.environ:
+if 'DATABASE_URL' in os.environ:
     # Utilise PostgreSQL sur Render
     DATABASES = {
         'default': dj_database_url.config(
-            default='sqlite:///db.sqlite3',
+            default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
             ssl_require=True
@@ -81,15 +84,14 @@ if DJ_DATABASE_URL_AVAILABLE and 'DATABASE_URL' in os.environ:
     }
     print("✅ Configuration PostgreSQL détectée")
 else:
-    # Utilise SQLite en local ou si dj-database-url n'est pas installé
+    # Utilise SQLite en local
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    print("⚠️ Utilisation de SQLite (local ou fallback)")
-
+    print("⚠️ Utilisation de SQLite (local)")
 
 AUTH_PASSWORD_VALIDATORS = [
     {

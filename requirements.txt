@@ -19,3 +19,4 @@ psycopg2-binary==2.9.9
 asgiref==3.8.1
 sqlparse==0.5.3
 tzdata==2024.2
+dj-database-url>=2.0.0
